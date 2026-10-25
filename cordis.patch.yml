@@ -1,0 +1,4 @@
+# Insert once through package.json's dsh.bundle.patch declaration.
+- insert:
+    - id: pomodoro-overlay
+      name: 'dsh-pomodoro-overlay'
