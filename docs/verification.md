@@ -3,17 +3,25 @@
 验证日期：2026-10-25  
 目标版本：DSH `0.2.1-rc.2`  
 GUI：`https://dsh.zhbc.bid:3003/`（不记录认证参数）  
-方式：正式 `dsh plugin --profile web add` 本地 link 安装，重启原部署，在隔离 Chrome 中运行真实 Host/Client bundle。
+历史真实 GUI 方法：正式 `dsh plugin --profile web add` 本地 link 安装，重启原部署，在隔离 Chrome 中运行当时的 Host/Client bundle。当前修订的验证范围见下文，不与历史结果混用。
 
 ## 自动化
 
 - `npm run verify`：通过。
-- `node:test`：**38/38 通过**（覆盖原生设置 slot、外观与字体校验、字体栈及即时外观更新）。
-- 独立只读审查：无阻断、高、中严重度问题；额外以逐步推进 oracle 对拍 `settleState` 的 896 组边界，全部一致。
-- 构建后客户端冒烟：ModuleLoader 加载、配置 ready 后自动启动、slots 注册、样式/监听器/计时器清理通过。
-- `npm pack --dry-run`：包内容检查通过。
+- `node:test`：**38/38 通过**（覆盖原生设置 slot、外观与字体校验、字体栈及 store 层外观即时更新语义；不是 DOM 样式验收）。
+- 历史独立只读审查：当时无阻断、高、中严重度问题；逐步推进 oracle 对拍 `settleState` 的 896 组边界全部一致。此后未修改 `settleState` 的阶段推进算法。
+- 构建后客户端冒烟：ModuleLoader 加载、配置 ready 后 store 启动、slots 注册，以及 `style.remove`、store 的 `storage` / `focus` / `pageshow` / `visibilitychange` 监听和 interval 清理通过。测试的 React 桩不会挂载 `ActiveOverlay`，因此不宣称 `ResizeObserver` / `MutationObserver`、窗口 resize / scroll、rAF / timeout 或 overlay DOM 清理已做真实 DOM 测试。
+- `npm publish --dry-run`：当前发布包内容检查通过。
 
-## 当前开发修订：原生设置窗口与外观配置（2026-10-25）
+## 当前发布基线：0.1.2（2026-10-25）
+
+- npm 包及运行时包标识为 `@tom2012/dsh-pomodoro-overlay`，发布版本为 `0.1.2`；GitHub 仓库继续使用 `zbc0315/dsh-pomodoro-overlay`。
+- Cordis patch ID 与 ConfigForm ID 保持 `pomodoro-overlay`，localStorage 键保持 `dsh-pomodoro-overlay:state:v1`；作用域迁移不更改这些持久化读取键。
+- 当前聊天区只显示大倒计时，不显示可见阶段标签、工具条或控制按钮；屏幕阅读器状态保留。
+- 旧版 `running: false` 快照会继续保持暂停；README 已说明仅删除 `dsh-pomodoro-overlay:state:v1` 并刷新的重置方法，不影响 DSH 配置。
+- 当前版本完成自动化测试、构建产物静态检查和 npm 发布演练。下述历史 GUI 结果仅作回归基线，不作为当前七字段设置、字体保存或无阶段标签 UI 已完成真实 GUI 验收的证明。
+
+## 当前功能：原生设置窗口与外观配置（2026-10-25）
 
 - 设置入口已从 `plugins.bundle.config` 迁移到 DSH 设置窗口的 `settings.section`，导航 ID 为 `pomodoro`。
 - Host schema 和 ConfigForm 已扩展为七字段：全局字体、专注/休息时长、`#RRGGBB` 颜色和 0–1 不透明度；设置 UI 显示 0–100%。
@@ -73,7 +81,7 @@ GUI：`https://dsh.zhbc.bid:3003/`（不记录认证参数）
 - 隔离浏览器中的运行状态已重置为运行中的 25 分钟专注。
 - 测试 Chrome 已关闭，临时 profile、重启脚本和临时日志已删除。
 
-## 本次 GUI 环境备注（既有冲突）
+## 历史 GUI 环境备注（既有冲突）
 
 未隔离的首次启动出现：
 
@@ -89,6 +97,6 @@ web boot: 1 entry did not activate
 slot "sidebar.right.tab.files.actions" is already declared
 ```
 
-只读检查确认，既有 `@tom/dsh-file-tree` 与 DSH 内置 `@deepseek-ai/dsh-client-ui-sidebar-files` 同时声明了这个 slot；番茄钟没有声明或修改该 slot。为让本次番茄钟自测能够进入真实聊天区，仅在隔离 Chrome 的 boot 清单中临时跳过了重复的内置 sidebar-files 客户端，并关闭该测试页的 HMR 以防完整清单再次注入。没有因此修改 DSH、file-tree 或 profile。
+只读检查确认，既有 `@tom/dsh-file-tree` 与 DSH 内置 `@deepseek-ai/dsh-client-ui-sidebar-files` 同时声明了这个 slot；番茄钟没有声明或修改该 slot。为让该次历史番茄钟自测能够进入真实聊天区，仅在隔离 Chrome 的 boot 清单中临时跳过了重复的内置 sidebar-files 客户端，并关闭该测试页的 HMR 以防完整清单再次注入。没有因此修改 DSH、file-tree 或 profile。
 
-因此：**番茄钟本身的真实 GUI 检查全部通过，但这不表示当前未隔离的日常 GUI 已解决上述既有冲突。** 日常 GUI 若要正常启动，需要另行处理 file-tree 与内置 sidebar-files 的重复声明；本次任务没有擅自卸载或改写它们。
+因此：**上述历史版本的番茄钟真实 GUI 检查全部通过，但这既不表示当前修订已完成全部 GUI 验收，也不表示未隔离的日常 GUI 已解决上述既有冲突。** 日常 GUI 若要正常启动，需要另行处理 file-tree 与内置 sidebar-files 的重复声明；历史测试没有擅自卸载或改写它们。
