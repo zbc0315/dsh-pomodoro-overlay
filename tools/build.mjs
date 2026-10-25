@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url'
 import { build } from 'esbuild'
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)))
-const packageName = 'dsh-pomodoro-overlay'
+const packageName = '@tom2012/dsh-pomodoro-overlay'
 const outputPath = join(root, 'client', 'client.js')
 
 const result = await build({

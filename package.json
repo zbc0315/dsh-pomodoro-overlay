@@ -1,6 +1,6 @@
 {
-  "name": "dsh-pomodoro-overlay",
-  "version": "0.1.0",
+  "name": "@tom2012/dsh-pomodoro-overlay",
+  "version": "0.1.1",
   "description": "Automatic focus/break Pomodoro cycles with a chat-sized translucent countdown for DeepSeek Harness Web.",
   "type": "module",
   "license": "MIT",

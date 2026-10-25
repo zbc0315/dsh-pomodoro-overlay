@@ -10,7 +10,7 @@
 2. **全局 UI 挂载点**：`ctx.slots.inject('shell.overlay', ...)` 后调用 `ctx.slots.register(...)`；现有插件 `dsh-todo-board/client/client.js:3644-3649` 是直接范例。
 3. **原生配置与设置页**：Host 用 Schemastery 声明七个 `.volatile()` 字段（一个字体、两个时长、两个颜色、两个不透明度）；客户端以 `ctx.configForms.get('pomodoro-overlay')` 读取/订阅，`mutate` 一次原子保存七个字段并携带 revision。设置 UI 注册到 `settings.section`，`id: 'pomodoro'`、`order: 30`、`label: '番茄钟'`。依据：`dsh-settings/README.zh.md:10-13,28-40`、`dsh-client-ui-settings/lib/types/client/config-form-types.d.ts:5-70`、`dsh-client-ui-settings/lib/types/client/contract/slots.d.ts:62-77`，以及 `dsh-client-ui-agent-preset/lib/client.js:2455-2462` 的原生注册范例。配置 ready 前不得启动计时。
 4. **聊天区域锚点**：Conversation 根节点带 `data-conversation-content`、`data-conversation-region="chat"`，输入区带 `data-composer-seat`、`data-conversation-region="composer"`。DOM 结构见 `dsh-client-ui-conversation/lib/client.js:17855-17876`。
-5. **样式生命周期**：样式标签标 `data-plugin="dsh-pomodoro-overlay"`，在 `ctx.effect` 内挂载并返回清理函数，避免 HMR 时误删或被误删；参考 `dsh-todo-board/client/client.js:3607-3619`。
+5. **样式生命周期**：样式标签标 `data-plugin="@tom2012/dsh-pomodoro-overlay"`，在 `ctx.effect` 内挂载并返回清理函数，避免 HMR 时误删或被误删；参考 `dsh-todo-board/client/client.js:3607-3619`。
 6. **包激活**：包的 `cordis.patch.yml` 使用 `insert` 增加一个插件服务；`package.json` 的 `dsh.bundle.patch` 指向它，`dsh.client` 声明 Web 客户端和 `slots` 注入。
 
 ## 布局算法
@@ -21,7 +21,7 @@
 - 侧栏和顶部导航不在聊天区矩形内，自然不会被覆盖。
 - 仅在聊天区内存在 `[data-chat-flow]` 时显示；selector 缺失、Chat 非活动或矩形异常时 fail-closed 隐藏，绝不退化成全屏遮挡。
 - 用 `ResizeObserver`、窗口 resize、捕获阶段 scroll 和受节流的 MutationObserver 保持位置准确；字体配置变化时也重新测量数字宽度，避免字宽差异导致裁切。
-- 整个聊天 overlay（阶段标签与数字）均为 `pointer-events: none`，不渲染工具条或控制按钮；设置页表单保持正常交互。
+- 整个聊天 overlay 均为 `pointer-events: none`，不渲染可见阶段标签、工具条或控制按钮；仅显示大数字，屏幕阅读器状态保留，设置页表单保持正常交互。
 - `data-*` 标记属于当前 DSH 内部 DOM，并非稳定选择器 API；本方案绑定已验证版本，升级后必须重跑布局冒烟测试。
 
 ## 文件结构

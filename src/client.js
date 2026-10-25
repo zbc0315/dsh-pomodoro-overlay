@@ -8,7 +8,7 @@ import { PomodoroSettings } from './settings.js'
 import { FOCUS } from './timer-core.js'
 
 const h = React.createElement
-const PACKAGE_NAME = 'dsh-pomodoro-overlay'
+const PACKAGE_NAME = '@tom2012/dsh-pomodoro-overlay'
 const FORM_ID = 'pomodoro-overlay'
 
 function phaseName(phase) {
@@ -156,14 +156,6 @@ function ActiveOverlay({ snapshot }) {
     'data-running': String(snapshot.running),
     'data-dpo-geometry': 'hidden',
   }, [
-    h('div', {
-      key: 'phase',
-      className: 'dpo-phase',
-      'data-dpo-phase': snapshot.phase,
-      title: snapshot.storageAvailable
-        ? '刷新或重开页面后按原时间线恢复'
-        : '浏览器存储不可用：本次页面内继续计时，刷新后可能重置',
-    }, status),
     h('div', {
       key: 'number',
       ref: numberRef,

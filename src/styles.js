@@ -25,23 +25,6 @@ export const CSS = String.raw`
   transform: translateX(-0.0325em);
   transition: color 160ms ease-out, opacity 160ms ease-out;
 }
-.dpo-phase {
-  position: absolute;
-  top: 16px;
-  left: 20px;
-  box-sizing: border-box;
-  min-height: 32px;
-  display: inline-flex;
-  align-items: center;
-  border: 1px solid var(--dsw-alias-border-l3);
-  border-radius: 999px;
-  padding: 4px 10px;
-  background: color-mix(in srgb, var(--dsw-alias-bg-base) 84%, transparent);
-  color: var(--dsw-alias-label-secondary);
-  font-size: 12px;
-  line-height: 20px;
-  pointer-events: none;
-}
 .dpo-button {
   box-sizing: border-box;
   min-width: 44px;
@@ -233,9 +216,6 @@ export const CSS = String.raw`
   font-size: 13px;
 }
 
-@container dpo (max-width: 480px) {
-  .dpo-phase { top: 8px; left: 8px; }
-}
 @media (max-width: 520px) {
   .dpo-field { grid-template-columns: 1fr; gap: 8px; }
   .dpo-actions .dpo-button { flex: 1 1 120px; }

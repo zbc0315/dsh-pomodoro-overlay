@@ -34,7 +34,7 @@ test('built client loads, auto-starts after config readiness and cleans up', asy
     },
     __ModuleLoader__: {
       load({ id, factory }) {
-        assert.equal(id, 'dsh-pomodoro-overlay')
+        assert.equal(id, '@tom2012/dsh-pomodoro-overlay')
         exported = factory((name) => {
           assert.equal(name, 'react')
           return { createElement: () => ({}) }
@@ -51,7 +51,7 @@ test('built client loads, auto-starts after config readiness and cleans up', asy
     clearInterval(id) { timers.delete(id) },
   }
   vm.runInNewContext(code, { window: windowRef, document: documentRef, console })
-  assert.equal(exported.name, 'dsh-pomodoro-overlay')
+  assert.equal(exported.name, '@tom2012/dsh-pomodoro-overlay')
   assert.deepEqual(Array.from(exported.inject), ['slots', 'configForms'])
 
   const form = {
