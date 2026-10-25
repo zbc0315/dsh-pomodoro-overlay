@@ -4,7 +4,18 @@
   "description": "Automatic focus/break Pomodoro cycles with a chat-sized translucent countdown for DeepSeek Harness Web.",
   "type": "module",
   "license": "MIT",
-  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zbc0315/dsh-pomodoro-overlay.git"
+  },
+  "homepage": "https://github.com/zbc0315/dsh-pomodoro-overlay#readme",
+  "bugs": {
+    "url": "https://github.com/zbc0315/dsh-pomodoro-overlay/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "engines": {
     "node": "^22.19.0 || >=24.0.0",
     "dsh": ">=0.2.0-rc.1 <0.3.0-0"
