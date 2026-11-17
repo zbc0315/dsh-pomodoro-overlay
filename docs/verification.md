@@ -8,18 +8,18 @@ GUI：`https://dsh.zhbc.bid:3003/`（不记录认证参数）
 ## 自动化
 
 - `npm run verify`：通过。
-- `node:test`：**38/38 通过**（覆盖原生设置 slot、外观与字体校验、字体栈及 store 层外观即时更新语义；不是 DOM 样式验收）。
+- `node:test`：**37/37 通过**（覆盖原生设置 slot、外观与字体校验、字体栈及 store 层外观即时更新语义；不是 DOM 样式验收）。
 - 历史独立只读审查：当时无阻断、高、中严重度问题；逐步推进 oracle 对拍 `settleState` 的 896 组边界全部一致。此后未修改 `settleState` 的阶段推进算法。
-- 构建后客户端冒烟：ModuleLoader 加载、配置 ready 后 store 启动、slots 注册，以及 `style.remove`、store 的 `storage` / `focus` / `pageshow` / `visibilitychange` 监听和 interval 清理通过。测试的 React 桩不会挂载 `ActiveOverlay`，因此不宣称 `ResizeObserver` / `MutationObserver`、窗口 resize / scroll、rAF / timeout 或 overlay DOM 清理已做真实 DOM 测试。
+- 构建后客户端冒烟：ModuleLoader 加载、配置 ready 后 store 启动、slots 注册，以及 `style.remove`、store 的 `storage` / `focus` / `pageshow` / `visibilitychange` 监听和 interval 清理通过。测试的 React 桩不会挂载 `ActiveOverlay`，因此不宣称 `ResizeObserver`、窗口 resize、rAF 或 overlay DOM 清理已做真实 DOM 测试。
 - `npm publish --dry-run`：当前发布包内容检查通过。
 
-## 当前发布基线：0.1.2（2026-10-25）
+## 当前发布基线：0.1.3（2026-11-17）
 
-- npm 包及运行时包标识为 `@tom2012/dsh-pomodoro-overlay`，发布版本为 `0.1.2`；GitHub 仓库继续使用 `zbc0315/dsh-pomodoro-overlay`。
+- npm 包及运行时包标识为 `@tom2012/dsh-pomodoro-overlay`，发布版本为 `0.1.3`；GitHub 仓库继续使用 `zbc0315/dsh-pomodoro-overlay`。
 - Cordis patch ID 与 ConfigForm ID 保持 `pomodoro-overlay`，localStorage 键保持 `dsh-pomodoro-overlay:state:v1`；作用域迁移不更改这些持久化读取键。
-- 当前聊天区只显示大倒计时，不显示可见阶段标签、工具条或控制按钮；屏幕阅读器状态保留。
+- 倒计时铺满整个浏览器视口，与当前视图无关；半透明数字覆盖在侧栏、顶栏、输入框与弹窗之上，overlay 整体保持 `pointer-events: none`。
 - 旧版 `running: false` 快照会继续保持暂停；README 已说明仅删除 `dsh-pomodoro-overlay:state:v1` 并刷新的重置方法，不影响 DSH 配置。
-- 当前版本完成自动化测试、构建产物静态检查和 npm 发布演练。下述历史 GUI 结果仅作回归基线，不作为当前七字段设置、字体保存或无阶段标签 UI 已完成真实 GUI 验收的证明。
+- 当前版本完成自动化测试、构建产物静态检查和 npm 发布演练。下述历史 GUI 结果仅作回归基线，不作为当前七字段设置、字体保存、无阶段标签 UI 或视口几何已完成真实 GUI 验收的证明。
 
 ## 当前功能：原生设置窗口与外观配置（2026-10-25）
 
@@ -30,7 +30,22 @@ GUI：`https://dsh.zhbc.bid:3003/`（不记录认证参数）
 - `npm run verify` 通过，**38/38 测试通过**；旧配置自动补齐默认字体与外观，不改变运行时间线。
 - Host schema 变更需要在**外部 Terminal** 重载 DSH；禁止从 DSH 会话内部杀掉自己的宿主。真实窗口保存验收将在外部重载后补记。
 
-## 当前修订：移除可见阶段标签（2026-10-25）
+## 当前功能：全局视口时钟（2026-11-17）
+
+- 应用户要求（"右侧边栏展开的时候，番茄时钟就自动缩小了……就算我不在对话界面，也要有"），倒计时从聊天区几何锚定改为铺满整个浏览器视口。
+- 不再测量聊天 DOM、不再扣除 composer、不再要求 `data-chat-flow`，也不再 fail-closed 隐藏；任何 DSH 视图都显示。
+- 半透明数字覆盖在侧栏、顶栏、输入框与弹窗之上，overlay 整体保持 `pointer-events: none`，可看穿、可点穿。
+- 几何改为 `window.innerWidth` / `window.innerHeight`（回退 `document.documentElement.clientWidth/Height`）；窗口 resize 时按动画帧重算，字体配置变化时重新测量数字宽度。
+- 聊天区几何测试（5 项）替换为视口几何测试（4 项），测试总数由 38 降为 37。
+- `npm run verify` 通过，**37/37 测试通过**。
+
+## 历史修订：0.1.2 文档对齐（2026-10-25）
+
+- 发布 0.1.2，仅修订文档：`README.md`、`docs/design.md`、`docs/architecture.md`、`docs/verification.md` 的版本号与措辞对齐。
+- 独立复核发现 9 处不一致（历史 GUI 基线与当前验收分离、数字边距固定 32px/64px、测试清单补全、inject 描述、构建产物一致性表述、过期追赶可能第三次切换、旧版 paused 快照永久暂停、客户端清理冒烟范围），全部修正。
+- 历史基线仍为 0.1.1（38/38 测试）；本修订不改变代码与测试数。
+
+## 历史修订：移除可见阶段标签（2026-10-25）
 
 - 应用户要求，聊天区不再显示「专注 / 休息」阶段标签及其胶囊样式，只保留大倒计时。
 - 屏幕阅读器的阶段与剩余时间文本保留；颜色、透明度、字体和计时行为不变。

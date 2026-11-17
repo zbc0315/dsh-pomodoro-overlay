@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { createPomodoroStore } from './browser-store.js'
-import { findChatOverlay } from './chat-geometry.js'
+import { viewportRect } from './chat-geometry.js'
 import { fontStack } from './font.js'
 import { CSS } from './styles.js'
 import { PomodoroSettings } from './settings.js'
@@ -57,38 +57,21 @@ function ActiveOverlay({ snapshot }) {
     if (!root) return undefined
     let disposed = false
     let frame = null
-    let mutationTimer = null
-    let observedChat = null
-    let observedComposer = null
 
-    const geometryObserver = typeof ResizeObserver === 'function'
-      ? new ResizeObserver(() => scheduleFrame())
-      : null
     const numberObserver = typeof ResizeObserver === 'function'
       ? new ResizeObserver(() => fitCountdown(root, numberRef.current))
       : null
 
     function update() {
       if (disposed) return
-      const match = findChatOverlay(document)
-      const nextChat = match?.chat ?? null
-      const nextComposer = nextChat?.querySelector('[data-composer-seat]') ?? null
-      if (nextChat !== observedChat || nextComposer !== observedComposer) {
-        observedChat = nextChat
-        observedComposer = nextComposer
-        geometryObserver?.disconnect()
-        if (observedChat) geometryObserver?.observe(observedChat)
-        if (observedComposer) geometryObserver?.observe(observedComposer)
-      }
-
-      if (!match) {
+      const rect = viewportRect(window)
+      if (!rect) {
         root.hidden = true
         root.dataset.dpoGeometry = 'hidden'
         return
       }
-      const { rect } = match
-      root.style.left = `${rect.left}px`
-      root.style.top = `${rect.top}px`
+      root.style.left = '0px'
+      root.style.top = '0px'
       root.style.width = `${rect.width}px`
       root.style.height = `${rect.height}px`
       root.hidden = false
@@ -104,38 +87,15 @@ function ActiveOverlay({ snapshot }) {
       })
     }
 
-    function scheduleMutationCheck() {
-      if (disposed || mutationTimer !== null) return
-      // Streaming messages can mutate often; rebind at most once per 160ms.
-      mutationTimer = window.setTimeout(() => {
-        mutationTimer = null
-        update()
-      }, 160)
-    }
-
-    const mutationObserver = typeof MutationObserver === 'function'
-      ? new MutationObserver(scheduleMutationCheck)
-      : null
-    mutationObserver?.observe(document.body, {
-      childList: true,
-      subtree: true,
-      attributes: true,
-      attributeFilter: ['data-conversation-content', 'data-chat-flow', 'data-composer-seat', 'hidden', 'inert'],
-    })
     numberObserver?.observe(root)
     window.addEventListener('resize', scheduleFrame)
-    window.addEventListener('scroll', scheduleFrame, true)
     update()
 
     return () => {
       disposed = true
-      geometryObserver?.disconnect()
       numberObserver?.disconnect()
-      mutationObserver?.disconnect()
       if (frame !== null) cancelAnimationFrame(frame)
-      if (mutationTimer !== null) clearTimeout(mutationTimer)
       window.removeEventListener('resize', scheduleFrame)
-      window.removeEventListener('scroll', scheduleFrame, true)
     }
   }, [])
 
